@@ -52,6 +52,7 @@ QWidgetImpl::QWidgetImpl(QWidgetImpl* parent) : QWidget(parent) {
   mouseMoveCallback_ = Persistent<Boolean>::New(Boolean::New(false));
   keyPressCallback_ = Persistent<Boolean>::New(Boolean::New(false));
   keyReleaseCallback_ = Persistent<Boolean>::New(Boolean::New(false));
+  closeEventCallback_ = Persistent<Boolean>::New(Boolean::New(false));
 }
 
 QWidgetImpl::~QWidgetImpl() {
@@ -61,6 +62,7 @@ QWidgetImpl::~QWidgetImpl() {
   mouseMoveCallback_.Dispose();
   keyPressCallback_.Dispose();
   keyReleaseCallback_.Dispose();
+  closeEventCallback_.Dispose();
 }
 
 void QWidgetImpl::paintEvent(QPaintEvent* e) {
@@ -161,6 +163,18 @@ void QWidgetImpl::keyReleaseEvent(QKeyEvent* e) {
   cb->Call(Context::GetCurrent()->Global(), argc, argv);
 }
 
+void QWidgetImpl::closeEvent(QCloseEvent * e) {
+  HandleScope scope;
+
+  if (!closeEventCallback_->IsFunction())
+    return;
+
+  Handle<Function> cb = Persistent<Function>::Cast(closeEventCallback_);
+
+  // close event has no arguments
+  cb->Call(Context::GetCurrent()->Global(), 0, NULL);
+}
+
 //
 // QWidgetWrap()
 //
@@ -226,6 +240,8 @@ void QWidgetWrap::Initialize(Handle<Object> target) {
       FunctionTemplate::New(KeyPressEvent)->GetFunction());
   tpl->PrototypeTemplate()->Set(String::NewSymbol("keyReleaseEvent"),
       FunctionTemplate::New(KeyReleaseEvent)->GetFunction());
+  tpl->PrototypeTemplate()->Set(String::NewSymbol("closeEvent"),
+      FunctionTemplate::New(CloseEvent)->GetFunction());
 
   constructor = Persistent<Function>::New(tpl->GetFunction());
   target->Set(String::NewSymbol("QWidget"), constructor);
@@ -438,6 +454,20 @@ Handle<Value> QWidgetWrap::KeyReleaseEvent(const Arguments& args) {
 
   q->keyReleaseCallback_.Dispose();
   q->keyReleaseCallback_ = Persistent<Function>::New(
+      Local<Function>::Cast(args[0]));
+
+  return scope.Close(Undefined());
+}
+
+Handle<Value> QWidgetWrap::CloseEvent(const Arguments & args) {
+  HandleScope scope;
+
+  // Get this pointer
+  QWidgetWrap * w = node::ObjectWrap::Unwrap<QWidgetWrap>(args.This());
+  QWidgetImpl * q = w->GetWrapped();
+
+  q->closeEventCallback_.Dispose();
+  q->closeEventCallback_ = Persistent<Function>::New(
       Local<Function>::Cast(args[0]));
 
   return scope.Close(Undefined());

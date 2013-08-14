@@ -9,6 +9,17 @@ For a translation of Qt's APIs into HTML5 APIs, see [Node-Five](http://github.co
 Supported platforms: **Mac OS X** | **Windows** | **Linux**
 
 
+
+
+
+#### Node-Qt-Extend
+
+**Node-Qt-Extend is based on Node-Qt, but provides more events and functions.**
+
+
+
+
+
 #### Hello world
 
 Ever wanted to create native apps directly from Node? Here's a simple example illustrating how to create a native window via `QWidget()` and draw via `QPainter()`:
@@ -16,7 +27,7 @@ Ever wanted to create native apps directly from Node? Here's a simple example il
 ![Screenshot](https://github.com/arturadib/node-qt/raw/master/examples/helloworld.png)
 
 ```javascript
-var qt = require('node-qt'),
+var qt = require('..'),
     app = new qt.QApplication,
     window = new qt.QWidget;
 
@@ -24,19 +35,24 @@ var qt = require('node-qt'),
 global.app = app;
 global.window = window;
 
-// Quirk: the virtual method paintEvent() is mapped into a callback setter
-window.paintEvent(function() {
+window.paintEvent(function () {
   var p = new qt.QPainter();
   p.begin(window);
   p.drawText(20, 30, 'hello node, hello qt');
   p.end();
 });
 
+window.closeEvent(function () {
+  process.exit(0); // exit the application
+});
+
 window.resize(300, 150);
 window.show();
 
 // Join Node's event loop
-setInterval(app.processEvents, 0);
+setInterval(function () {
+  app.processEvents();
+}, 0);
 ```
 
 

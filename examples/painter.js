@@ -71,6 +71,10 @@ widget.mouseMoveEvent(function(e) {
   widget.update();
 });
 
+window.closeEvent(function () {
+  process.exit(0);
+});
+
 // Prevent objects from being GC'd
 global.window = window;
 global.area = area;

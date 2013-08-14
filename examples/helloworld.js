@@ -35,15 +35,21 @@ var qt = require('..'),
 global.app = app;
 global.window = window;
 
-window.paintEvent(function(){
+window.paintEvent(function () {
   var p = new qt.QPainter();
   p.begin(window);
   p.drawText(20, 30, 'hello node, hello qt');
   p.end();
 });
 
+window.closeEvent(function () {
+  process.exit(0);
+});
+
 window.resize(300, 150);
 window.show();
 
 // Join Node's event loop
-setInterval(app.processEvents, 0);
+setInterval(function () {
+  app.processEvents();
+}, 0);
