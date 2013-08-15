@@ -1,7 +1,7 @@
-// Copyright (c) 2012, Artur Adib
+// Copyright (c) 2013, Cheng Luyu
 // All rights reserved.
 //
-// Author(s): Artur Adib <aadib@mozilla.com>
+// Author(s): Cheng Luyu <chengluyu@live.cn>
 //
 // You may use this file under the terms of the New BSD license as follows:
 //
@@ -29,55 +29,46 @@
 
 #define BUILDING_NODE_EXTENSION
 #include <node.h>
-
-#include "QtCore/qsize.h"
-#include "QtCore/qpointf.h"
-#include "QtCore/qrect.h"
-
-#include "QtGui/qapplication.h"
-#include "QtGui/qwidget.h"
-#include "QtGui/qmouseevent.h"
-#include "QtGui/qkeyevent.h"
-#include "QtGui/qpixmap.h"
-#include "QtGui/qpainter.h"
-#include "QtGui/qcolor.h"
-#include "QtGui/qbrush.h"
-#include "QtGui/qpen.h"
-#include "QtGui/qimage.h"
-#include "QtGui/qpainterpath.h"
-#include "QtGui/qfont.h"
-#include "QtGui/qmatrix.h"
-#include "QtGui/qsound.h"
-#include "QtGui/qscrollarea.h"
-#include "QtGui/qscrollbar.h"
-#include "QtGui/qcloseevent.h"
-
-#include "QtTest/qtesteventlist.h"
+#include "qcloseevent.h"
+#include "../qt_v8.h"
 
 using namespace v8;
 
-void Initialize(Handle<Object> target) {
-  QApplicationWrap::Initialize(target);
-  QWidgetWrap::Initialize(target);
-  QSizeWrap::Initialize(target);
-  QMouseEventWrap::Initialize(target);
-  QKeyEventWrap::Initialize(target);
-  QTestEventListWrap::Initialize(target);
-  QPixmapWrap::Initialize(target);
-  QPainterWrap::Initialize(target);
-  QColorWrap::Initialize(target);
-  QBrushWrap::Initialize(target);
-  QPenWrap::Initialize(target);
-  QImageWrap::Initialize(target);
-  QPointFWrap::Initialize(target);
-  QPainterPathWrap::Initialize(target);
-  QFontWrap::Initialize(target);
-  QMatrixWrap::Initialize(target);
-  QSoundWrap::Initialize(target);
-  QScrollAreaWrap::Initialize(target);
-  QScrollBarWrap::Initialize(target);
-  QRectWrap::Initialize(target);
-  QCloseEventWrap::Initialize(target);
+Persistent<Function> QCloseEventWrap::constructor;
+
+QCloseEventWrap::QCloseEventWrap() : q_(NULL) {
+  // Standalone constructor not implemented
+  // Use SetWrapped()
 }
 
-NODE_MODULE(qt, Initialize)
+QCloseEventWrap::~QCloseEventWrap() {
+  delete q_;
+}
+
+void QCloseEventWrap::Initialize(Handle<Object> target) {
+  Local<FunctionTemplate> tpl = FunctionTemplate::New(New);
+  tpl->SetClassName(String::NewSymbol("QCloseEvent"));
+  tpl->InstanceTemplate()->SetInternalFieldCount(1);
+
+  constructor = Persistent<Function>::New(tpl->GetFunction());
+  target->Set(String::NewSymbol("QCloseEvent"), constructor);
+}
+
+Handle<Value> QCloseEventWrap::New(const Arguments& args) {
+  HandleScope scope;
+
+  QCloseEventWrap* w = new QCloseEventWrap;
+  w->Wrap(args.This());
+
+  return args.This();
+}
+
+Handle<Value> QCloseEventWrap::NewInstance(QCloseEvent q) {
+  HandleScope scope;
+  
+  Local<Object> instance = constructor->NewInstance(0, NULL);
+  QCloseEventWrap* w = node::ObjectWrap::Unwrap<QCloseEventWrap>(instance);
+  w->SetWrapped(q);
+
+  return scope.Close(instance);
+}

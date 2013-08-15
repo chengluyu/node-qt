@@ -69,12 +69,24 @@ void QPainterWrap::Initialize(Handle<Object> target) {
       FunctionTemplate::New(Save)->GetFunction());
   tpl->PrototypeTemplate()->Set(String::NewSymbol("restore"),
       FunctionTemplate::New(Restore)->GetFunction());
+  // State
   tpl->PrototypeTemplate()->Set(String::NewSymbol("setPen"),
       FunctionTemplate::New(SetPen)->GetFunction());
   tpl->PrototypeTemplate()->Set(String::NewSymbol("setFont"),
       FunctionTemplate::New(SetFont)->GetFunction());
   tpl->PrototypeTemplate()->Set(String::NewSymbol("setMatrix"),
       FunctionTemplate::New(SetMatrix)->GetFunction());
+  // Paint actions
+  tpl->PrototypeTemplate()->Set(String::NewSymbol("drawPoint"),
+      FunctionTemplate::New(DrawPoint)->GetFunction());
+  tpl->PrototypeTemplate()->Set(String::NewSymbol("drawLine"),
+      FunctionTemplate::New(DrawLine)->GetFunction());
+  tpl->PrototypeTemplate()->Set(String::NewSymbol("drawArc"),
+      FunctionTemplate::New(DrawArc)->GetFunction());
+  tpl->PrototypeTemplate()->Set(String::NewSymbol("drawRect"),
+      FunctionTemplate::New(DrawRect)->GetFunction());
+  tpl->PrototypeTemplate()->Set(String::NewSymbol("drawEllipse"),
+      FunctionTemplate::New(DrawEllipse)->GetFunction());
   tpl->PrototypeTemplate()->Set(String::NewSymbol("fillRect"),
       FunctionTemplate::New(FillRect)->GetFunction());
   tpl->PrototypeTemplate()->Set(String::NewSymbol("drawText"),
@@ -255,6 +267,85 @@ Handle<Value> QPainterWrap::SetMatrix(const Arguments& args) {
   QMatrix* matrix = matrix_wrap->GetWrapped();
 
   q->setMatrix(*matrix, args[1]->BooleanValue());
+
+  return scope.Close(Undefined());
+}
+
+// Supported versions:
+// drawPoint(int x, int y)
+Handle<v8::Value> QPainterWrap::DrawPoint(const v8::Arguments& args) {
+  HandleScope scope;
+
+  QPainterWrap * w = ObjectWrap::Unwrap<QPainterWrap>(args.This());
+  QPainter* q = w->GetWrapped();
+
+  if (args[0]->IsNumber() && args[1]->IsNumber())
+    q->drawPoint(args[0]->IntegerValue(), args[1]->IntegerValue());
+
+  return scope.Close(Undefined());
+}
+
+// Suported versions:
+// drawLine(int x1, int y1, int x2, int y2)
+Handle<v8::Value> QPainterWrap::DrawLine(const v8::Arguments& args) {
+  HandleScope scope;
+
+  QPainterWrap * w = ObjectWrap::Unwrap<QPainterWrap>(args.This());
+  QPainter* q = w->GetWrapped();
+
+  if (args[0]->IsNumber() && args[1]->IsNumber() && args[2]->IsNumber() &&
+      args[3]->IsNumber())
+    q->drawLine(args[0]->IntegerValue(), args[1]->IntegerValue(), 
+        args[2]->IntegerValue(), args[3]->IntegerValue());
+
+  return scope.Close(Undefined());
+}
+
+// Suported versions:
+// drawArc(int x, int y, int w, int h, int a, int alen)
+Handle<v8::Value> QPainterWrap::DrawArc(const v8::Arguments& args) {
+  HandleScope scope;
+
+  QPainterWrap * w = ObjectWrap::Unwrap<QPainterWrap>(args.This());
+  QPainter* q = w->GetWrapped();
+
+  if (args[0]->IsNumber() && args[1]->IsNumber() && args[2]->IsNumber() &&
+      args[3]->IsNumber() && args[4]->IsNumber() && args[5]->IsNumber())
+    q->drawArc(args[0]->IntegerValue(), args[1]->IntegerValue(),
+        args[2]->IntegerValue(), args[3]->IntegerValue(),
+        args[4]->IntegerValue(), args[5]->IntegerValue());
+
+  return scope.Close(Undefined());
+}
+
+// Suported versions:
+// drawRect(int x, int y, int w, int h)
+Handle<v8::Value> QPainterWrap::DrawRect(const v8::Arguments& args) {
+  HandleScope scope;
+
+  QPainterWrap * w = ObjectWrap::Unwrap<QPainterWrap>(args.This());
+  QPainter* q = w->GetWrapped();
+
+  if (args[0]->IsNumber() && args[1]->IsNumber() && args[2]->IsNumber() &&
+      args[3]->IsNumber())
+    q->drawRect(args[0]->IntegerValue(), args[1]->IntegerValue(),
+        args[2]->IntegerValue(), args[3]->IntegerValue());
+
+  return scope.Close(Undefined());
+}
+
+// Suported versions:
+// drawEllipse(int x, int y, int w, int h)
+Handle<v8::Value> QPainterWrap::DrawEllipse(const v8::Arguments& args) {
+  HandleScope scope;
+
+  QPainterWrap * w = ObjectWrap::Unwrap<QPainterWrap>(args.This());
+  QPainter* q = w->GetWrapped();
+
+  if (args[0]->IsNumber() && args[1]->IsNumber() && args[2]->IsNumber() &&
+      args[3]->IsNumber())
+    q->drawEllipse(args[0]->IntegerValue(), args[1]->IntegerValue(),
+        args[2]->IntegerValue(), args[3]->IntegerValue());
 
   return scope.Close(Undefined());
 }

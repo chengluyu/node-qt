@@ -7,6 +7,7 @@
 
         'src/QtCore/qsize.cc',
         'src/QtCore/qpointf.cc',
+        'src/QtCore/qrect.cc',
 
         'src/QtGui/qapplication.cc',
         'src/QtGui/qwidget.cc',
@@ -24,6 +25,7 @@
         'src/QtGui/qsound.cc',
         'src/QtGui/qscrollarea.cc',
         'src/QtGui/qscrollbar.cc',
+        'src/QtGui/qcloseevent.cc',
 
         'src/QtTest/qtesteventlist.cc'
       ],

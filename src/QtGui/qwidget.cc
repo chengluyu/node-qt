@@ -34,6 +34,7 @@
 #include "qwidget.h"
 #include "qmouseevent.h"
 #include "qkeyevent.h"
+#include "qcloseevent.h"
 
 using namespace v8;
 
@@ -169,10 +170,14 @@ void QWidgetImpl::closeEvent(QCloseEvent * e) {
   if (!closeEventCallback_->IsFunction())
     return;
 
+  const unsigned argc = 1;
+  Handle<Value> argv[argc] = {
+    QCloseEventWrap::NewInstance(*e)
+  };
   Handle<Function> cb = Persistent<Function>::Cast(closeEventCallback_);
 
   // close event has no arguments
-  cb->Call(Context::GetCurrent()->Global(), 0, NULL);
+  cb->Call(Context::GetCurrent()->Global(), argc, argv);
 }
 
 //

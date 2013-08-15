@@ -1,7 +1,7 @@
-// Copyright (c) 2012, Artur Adib
+// Copyright (c) 2013, Cheng Luyu
 // All rights reserved.
 //
-// Author(s): Artur Adib <aadib@mozilla.com>
+// Author(s): Cheng Luyu <chengluyu@live.cn>
 //
 // You may use this file under the terms of the New BSD license as follows:
 //
@@ -27,57 +27,35 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF 
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+
+#ifndef QCLOSEEVENTWRAP_H
+#define QCLOSEEVENTWRAP_H
+
 #define BUILDING_NODE_EXTENSION
 #include <node.h>
+#include <QCloseEvent>
 
-#include "QtCore/qsize.h"
-#include "QtCore/qpointf.h"
-#include "QtCore/qrect.h"
+class QCloseEventWrap : public node::ObjectWrap {
+public:
+  static void Initialize(v8::Handle<v8::Object> target);
+  static v8::Handle<v8::Value> NewInstance(QCloseEvent q);
+  QCloseEvent * GetWrapped() const { return q_; }
+  void SetWrapped(QCloseEvent q) {
+    if (q_) delete q_;
+    q_ = new QCloseEvent(q);
+  }
 
-#include "QtGui/qapplication.h"
-#include "QtGui/qwidget.h"
-#include "QtGui/qmouseevent.h"
-#include "QtGui/qkeyevent.h"
-#include "QtGui/qpixmap.h"
-#include "QtGui/qpainter.h"
-#include "QtGui/qcolor.h"
-#include "QtGui/qbrush.h"
-#include "QtGui/qpen.h"
-#include "QtGui/qimage.h"
-#include "QtGui/qpainterpath.h"
-#include "QtGui/qfont.h"
-#include "QtGui/qmatrix.h"
-#include "QtGui/qsound.h"
-#include "QtGui/qscrollarea.h"
-#include "QtGui/qscrollbar.h"
-#include "QtGui/qcloseevent.h"
+private:
+  QCloseEventWrap();
+  ~QCloseEventWrap();
 
-#include "QtTest/qtesteventlist.h"
+  static v8::Persistent<v8::Function> constructor;
+  static v8::Handle<v8::Value> New(const v8::Arguments& args);
 
-using namespace v8;
+  // Wrapped methods - None, QCloseEvent is a empty type
 
-void Initialize(Handle<Object> target) {
-  QApplicationWrap::Initialize(target);
-  QWidgetWrap::Initialize(target);
-  QSizeWrap::Initialize(target);
-  QMouseEventWrap::Initialize(target);
-  QKeyEventWrap::Initialize(target);
-  QTestEventListWrap::Initialize(target);
-  QPixmapWrap::Initialize(target);
-  QPainterWrap::Initialize(target);
-  QColorWrap::Initialize(target);
-  QBrushWrap::Initialize(target);
-  QPenWrap::Initialize(target);
-  QImageWrap::Initialize(target);
-  QPointFWrap::Initialize(target);
-  QPainterPathWrap::Initialize(target);
-  QFontWrap::Initialize(target);
-  QMatrixWrap::Initialize(target);
-  QSoundWrap::Initialize(target);
-  QScrollAreaWrap::Initialize(target);
-  QScrollBarWrap::Initialize(target);
-  QRectWrap::Initialize(target);
-  QCloseEventWrap::Initialize(target);
-}
+  // Wrapped object
+  QCloseEvent * q_;
+};
 
-NODE_MODULE(qt, Initialize)
+#endif
