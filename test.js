@@ -10,7 +10,9 @@ global.window = window;
 window.paintEvent(function () {
   var p = new qt.QPainter();
   p.begin(window);
+  p.setRenderHint(qt.RenderHint.Antialiasing);
   p.drawText(20, 30, 'hello node, hello qt');
+  p.drawArc(new qt.QRect(10,10, 70,100), 100*16, 160*16);
   p.end();
 });
 
@@ -22,9 +24,6 @@ window.closeEvent(function (args) {
 window.resize(300, 150);
 window.move(300, 300);
 window.show();
-
-var rect = new qt.QRect(1, 2, 3, 4);
-console.log(rect.x(), rect.y(), rect.width(), rect.height());
 
 // Join Node's event loop
 setInterval(function () {

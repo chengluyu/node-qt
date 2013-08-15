@@ -40,6 +40,7 @@
 #include "qpainterpath.h"
 #include "qfont.h"
 #include "qmatrix.h"
+#include "../QtCore/qrect.h"
 
 using namespace v8;
 
@@ -76,6 +77,8 @@ void QPainterWrap::Initialize(Handle<Object> target) {
       FunctionTemplate::New(SetFont)->GetFunction());
   tpl->PrototypeTemplate()->Set(String::NewSymbol("setMatrix"),
       FunctionTemplate::New(SetMatrix)->GetFunction());
+  tpl->PrototypeTemplate()->Set(String::NewSymbol("setRenderHint"),
+      FunctionTemplate::New(SetRenderHint)->GetFunction());
   // Paint actions
   tpl->PrototypeTemplate()->Set(String::NewSymbol("drawPoint"),
       FunctionTemplate::New(DrawPoint)->GetFunction());
@@ -271,6 +274,21 @@ Handle<Value> QPainterWrap::SetMatrix(const Arguments& args) {
   return scope.Close(Undefined());
 }
 
+// This seems to be undocumented in Qt, too. but it really exists!
+Handle<Value> QPainterWrap::SetRenderHint(const Arguments& args) {
+  HandleScope scope;
+
+  QPainterWrap* w = ObjectWrap::Unwrap<QPainterWrap>(args.This());
+  QPainter* q = w->GetWrapped();
+
+  bool value = args[1]->IsBoolean() ? args[1]->BooleanValue() : true;
+
+  if (args[0]->IsNumber())
+    q->setRenderHint(static_cast<QPainter::RenderHint>(args[0]->IntegerValue()), value);
+
+  return scope.Close(Undefined());
+}
+
 // Supported versions:
 // drawPoint(int x, int y)
 Handle<v8::Value> QPainterWrap::DrawPoint(const v8::Arguments& args) {
@@ -303,6 +321,7 @@ Handle<v8::Value> QPainterWrap::DrawLine(const v8::Arguments& args) {
 
 // Suported versions:
 // drawArc(int x, int y, int w, int h, int a, int alen)
+// drawArc(QRect rect, int a, int alen)
 Handle<v8::Value> QPainterWrap::DrawArc(const v8::Arguments& args) {
   HandleScope scope;
 
@@ -315,11 +334,25 @@ Handle<v8::Value> QPainterWrap::DrawArc(const v8::Arguments& args) {
         args[2]->IntegerValue(), args[3]->IntegerValue(),
         args[4]->IntegerValue(), args[5]->IntegerValue());
 
+  else if (args[0]->IsObject() && args[1]->IsNumber() &&
+      args[2]->IsNumber()) {
+
+    QString arg0_constructor = qt_v8::ToQString(
+        args[0]->ToObject()->GetConstructorName());
+
+    if (arg0_constructor == "QRect") {
+      QRectWrap * rect_wrap = ObjectWrap::Unwrap<QRectWrap>(args[0]->ToObject());
+      QRect * rect = rect_wrap->GetWrapped();
+      q->drawArc(*rect, args[1]->IntegerValue(), args[2]->IntegerValue());
+    }
+  }
+
   return scope.Close(Undefined());
 }
 
 // Suported versions:
 // drawRect(int x, int y, int w, int h)
+// drawRect(QRect rect)
 Handle<v8::Value> QPainterWrap::DrawRect(const v8::Arguments& args) {
   HandleScope scope;
 
@@ -331,11 +364,23 @@ Handle<v8::Value> QPainterWrap::DrawRect(const v8::Arguments& args) {
     q->drawRect(args[0]->IntegerValue(), args[1]->IntegerValue(),
         args[2]->IntegerValue(), args[3]->IntegerValue());
 
+  else if (args[0]->IsObject()) {
+    QString arg0_constructor = qt_v8::ToQString(
+        args[0]->ToObject()->GetConstructorName());
+
+    if (arg0_constructor == "QRect") {
+      QRectWrap * rect_wrap = ObjectWrap::Unwrap<QRectWrap>(args[0]->ToObject());
+      QRect * rect = rect_wrap->GetWrapped();
+      q->drawRect(*rect);
+    }
+  }
+
   return scope.Close(Undefined());
 }
 
 // Suported versions:
 // drawEllipse(int x, int y, int w, int h)
+// drawEllipse(QRect rect)
 Handle<v8::Value> QPainterWrap::DrawEllipse(const v8::Arguments& args) {
   HandleScope scope;
 
@@ -347,6 +392,17 @@ Handle<v8::Value> QPainterWrap::DrawEllipse(const v8::Arguments& args) {
     q->drawEllipse(args[0]->IntegerValue(), args[1]->IntegerValue(),
         args[2]->IntegerValue(), args[3]->IntegerValue());
 
+  else if (args[0]->IsObject()) {
+    QString arg0_constructor = qt_v8::ToQString(
+        args[0]->ToObject()->GetConstructorName());
+
+    if (arg0_constructor == "QRect") {
+      QRectWrap * rect_wrap = ObjectWrap::Unwrap<QRectWrap>(args[0]->ToObject());
+      QRect * rect = rect_wrap->GetWrapped();
+      q->drawEllipse(*rect);
+    }
+  }
+  
   return scope.Close(Undefined());
 }
 

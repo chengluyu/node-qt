@@ -59,6 +59,7 @@ class QPainterWrap : public node::ObjectWrap {
   static v8::Handle<v8::Value> SetPen(const v8::Arguments& args);
   static v8::Handle<v8::Value> SetFont(const v8::Arguments& args);
   static v8::Handle<v8::Value> SetMatrix(const v8::Arguments& args);
+  static v8::Handle<v8::Value> SetRenderHint(const v8::Arguments& args);
 
   // Paint actions
   static v8::Handle<v8::Value> DrawPoint(const v8::Arguments& args);
