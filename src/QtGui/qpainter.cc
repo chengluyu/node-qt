@@ -70,6 +70,9 @@ void QPainterWrap::Initialize(Handle<Object> target) {
       FunctionTemplate::New(Save)->GetFunction());
   tpl->PrototypeTemplate()->Set(String::NewSymbol("restore"),
       FunctionTemplate::New(Restore)->GetFunction());
+  // Property
+  tpl->PrototypeTemplate()->Set(String::NewSymbol("viewport"),
+      FunctionTemplate::New(Viewport)->GetFunction());
   // State
   tpl->PrototypeTemplate()->Set(String::NewSymbol("setPen"),
       FunctionTemplate::New(SetPen)->GetFunction());
@@ -79,6 +82,10 @@ void QPainterWrap::Initialize(Handle<Object> target) {
       FunctionTemplate::New(SetMatrix)->GetFunction());
   tpl->PrototypeTemplate()->Set(String::NewSymbol("setRenderHint"),
       FunctionTemplate::New(SetRenderHint)->GetFunction());
+  tpl->PrototypeTemplate()->Set(String::NewSymbol("setWindow"),
+      FunctionTemplate::New(SetWindow)->GetFunction());
+  tpl->PrototypeTemplate()->Set(String::NewSymbol("setViewport"),
+      FunctionTemplate::New(SetViewport)->GetFunction());
   // Paint actions
   tpl->PrototypeTemplate()->Set(String::NewSymbol("drawPoint"),
       FunctionTemplate::New(DrawPoint)->GetFunction());
@@ -193,6 +200,17 @@ Handle<Value> QPainterWrap::Restore(const Arguments& args) {
   return scope.Close(Undefined());
 }
 
+Handle<Value> QPainterWrap::Viewport(const Arguments& args) {
+  HandleScope scope;
+
+  QPainterWrap* w = ObjectWrap::Unwrap<QPainterWrap>(args.This());
+  QPainter* q = w->GetWrapped();
+
+  QRect rect = q->viewport();
+
+  return scope.Close(QRectWrap::NewInstance(rect));
+}
+
 // Supported implementations:
 //   setPen( QPen pen )
 Handle<Value> QPainterWrap::SetPen(const Arguments& args) {
@@ -285,6 +303,56 @@ Handle<Value> QPainterWrap::SetRenderHint(const Arguments& args) {
 
   if (args[0]->IsNumber())
     q->setRenderHint(static_cast<QPainter::RenderHint>(args[0]->IntegerValue()), value);
+
+  return scope.Close(Undefined());
+}
+
+// Supported versions:
+// setWindow(int x, int y, int w, int h)
+// setWindow(QRect rect)
+Handle<Value> QPainterWrap::SetWindow(const Arguments& args) {
+  HandleScope scope;
+
+  QPainterWrap* w = ObjectWrap::Unwrap<QPainterWrap>(args.This());
+  QPainter* q = w->GetWrapped();
+
+  if (args[0]->IsObject()) {
+    QString arg0_constructor = qt_v8::ToQString(
+        args[0]->ToObject()->GetConstructorName());
+
+    if (arg0_constructor == "QRect") {
+      QRectWrap * rect_wrap = ObjectWrap::Unwrap<QRectWrap>(args[0]->ToObject());
+      QRect * rect = rect_wrap->GetWrapped();
+      q->setWindow(*rect);
+    }
+  }
+
+  else if (args[0]->IsNumber() && args[1]->IsNumber() && args[2]->IsNumber()
+      && args[3]->IsNumber()) {
+
+    q->setWindow(args[0]->IntegerValue(), args[1]->IntegerValue(),
+        args[2]->IntegerValue(), args[3]->IntegerValue());
+  }
+
+  return scope.Close(Undefined());
+}
+
+Handle<Value> QPainterWrap::SetViewport(const Arguments& args) {
+  HandleScope scope;
+
+  QPainterWrap* w = ObjectWrap::Unwrap<QPainterWrap>(args.This());
+  QPainter* q = w->GetWrapped();
+
+  if (args[0]->IsObject()) {
+    QString arg0_constructor = qt_v8::ToQString(
+        args[0]->ToObject()->GetConstructorName());
+
+    if (arg0_constructor == "QRect") {
+      QRectWrap * rect_wrap = ObjectWrap::Unwrap<QRectWrap>(args[0]->ToObject());
+      QRect * rect = rect_wrap->GetWrapped();
+      q->setViewport(*rect);
+    }
+  }
 
   return scope.Close(Undefined());
 }

@@ -11,17 +11,32 @@ window.paintEvent(function () {
   var p = new qt.QPainter();
   p.begin(window);
   p.setRenderHint(qt.RenderHint.Antialiasing);
-  p.drawText(20, 30, 'hello node, hello qt');
-  p.drawArc(new qt.QRect(10,10, 70,100), 100*16, 160*16);
+  for (var x = 5; x <= 305; x += 20)
+    p.drawLine(x, 5, x, 145);
+  for (var y = 5; y <= 145; y += 20)
+    p.drawLine(5, y, 305, y);
   p.end();
 });
 
-window.closeEvent(function (args) {
-  console.log(args.constructor);
+window.leaveEvent(function (e) {
+  console.log(e.constructor);
+  console.log('Left.');
+});
+
+window.enterEvent(function (e) {
+  console.log('Entered.');
+});
+
+window.closeEvent(function (e) {
   process.exit(0);
 });
 
-window.resize(300, 150);
+window.resizeEvent(function (e) {
+  console.log("New size:", e.size().width(), e.size().height());
+  console.log("Old size:", e.oldSize().width(), e.oldSize().height());
+});
+
+window.resize(310, 150);
 window.move(300, 300);
 window.show();
 

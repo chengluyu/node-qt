@@ -51,6 +51,10 @@ void QRectWrap::Initialize(Handle<Object> target) {
   tpl->InstanceTemplate()->SetInternalFieldCount(1);  
 
   // Prototype
+  tpl->PrototypeTemplate()->Set(String::NewSymbol("left"),
+      FunctionTemplate::New(Left)->GetFunction());
+  tpl->PrototypeTemplate()->Set(String::NewSymbol("top"),
+      FunctionTemplate::New(Top)->GetFunction());
   tpl->PrototypeTemplate()->Set(String::NewSymbol("x"),
       FunctionTemplate::New(X)->GetFunction());
   tpl->PrototypeTemplate()->Set(String::NewSymbol("y"),
@@ -106,6 +110,24 @@ Handle<Value> QRectWrap::Y(const Arguments& args) {
   QRect * q = w->GetWrapped();
 
   return scope.Close(Number::New(q->y()));
+}
+
+Handle<Value> QRectWrap::Left(const Arguments& args) {
+  HandleScope scope;
+
+  QRectWrap * w = ObjectWrap::Unwrap<QRectWrap>(args.This());
+  QRect * q = w->GetWrapped();
+
+  return scope.Close(Number::New(q->left()));
+}
+
+Handle<Value> QRectWrap::Top(const Arguments& args) {
+  HandleScope scope;
+
+  QRectWrap * w = ObjectWrap::Unwrap<QRectWrap>(args.This());
+  QRect * q = w->GetWrapped();
+
+  return scope.Close(Number::New(q->top()));
 }
 
 Handle<Value> QRectWrap::Width(const Arguments& args) {

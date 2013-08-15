@@ -49,6 +49,9 @@ class QWidgetImpl : public QWidget {
   v8::Persistent<v8::Value> keyPressCallback_;
   v8::Persistent<v8::Value> keyReleaseCallback_;
   v8::Persistent<v8::Value> closeEventCallback_;
+  v8::Persistent<v8::Value> enterEventCallback_;
+  v8::Persistent<v8::Value> leaveEventCallback_;
+  v8::Persistent<v8::Value> resizeEventCallback_;
 
  private:
   void paintEvent(QPaintEvent* e);
@@ -58,6 +61,9 @@ class QWidgetImpl : public QWidget {
   void keyPressEvent(QKeyEvent* e);
   void keyReleaseEvent(QKeyEvent* e);
   void closeEvent(QCloseEvent * e);
+  void enterEvent(QEvent * e);
+  void leaveEvent(QEvent * e);
+  void resizeEvent(QResizeEvent * e);
 };
 
 //
@@ -103,6 +109,9 @@ class QWidgetWrap : public node::ObjectWrap {
   static v8::Handle<v8::Value> KeyPressEvent(const v8::Arguments& args);
   static v8::Handle<v8::Value> KeyReleaseEvent(const v8::Arguments& args);
   static v8::Handle<v8::Value> CloseEvent(const v8::Arguments & args);
+  static v8::Handle<v8::Value> EnterEvent(const v8::Arguments & args);
+  static v8::Handle<v8::Value> LeaveEvent(const v8::Arguments & args);
+  static v8::Handle<v8::Value> ResizeEvent(const v8::Arguments & args);
 
   // Wrapped object
   QWidgetImpl* q_;

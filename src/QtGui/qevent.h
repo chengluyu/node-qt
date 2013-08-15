@@ -27,39 +27,35 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF 
 // THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef QRECTWRAP_H
-#define QRECTWRAP_H
+
+#ifndef QEVENTWRAP_H
+#define QEVENTWRAP_H
 
 #define BUILDING_NODE_EXTENSION
 #include <node.h>
-#include <QRect>
+#include <QEvent>
 
-class QRectWrap : public node::ObjectWrap {
+class QEventWrap : public node::ObjectWrap {
 public:
   static void Initialize(v8::Handle<v8::Object> target);
-  static v8::Handle<v8::Value> NewInstance(QRect q);
-  QRect * GetWrapped() const { return q_; }
-  void SetWrapped(QRect q) {
+  static v8::Handle<v8::Value> NewInstance(QEvent q);
+  QEvent * GetWrapped() const { return q_; }
+  void SetWrapped(QEvent q) {
     if (q_) delete q_;
-    q_ = new QRect(q);
+    q_ = new QEvent(q);
   }
 
 private:
-  QRectWrap();
-  ~QRectWrap();
+  QEventWrap();
+  ~QEventWrap();
+
   static v8::Persistent<v8::Function> constructor;
   static v8::Handle<v8::Value> New(const v8::Arguments& args);
 
-  // Wrapped methods
-  static v8::Handle<v8::Value> Left(const v8::Arguments& args);
-  static v8::Handle<v8::Value> Top(const v8::Arguments& args);
-  static v8::Handle<v8::Value> X(const v8::Arguments& args);
-  static v8::Handle<v8::Value> Y(const v8::Arguments& args);
-  static v8::Handle<v8::Value> Width(const v8::Arguments& args);
-  static v8::Handle<v8::Value> Height(const v8::Arguments& args);
+  // Wrapped methods - None, QEvent is a empty type
 
   // Wrapped object
-  QRect * q_;
+  QEvent * q_;
 };
 
 #endif

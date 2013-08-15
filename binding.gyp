@@ -26,6 +26,8 @@
         'src/QtGui/qscrollarea.cc',
         'src/QtGui/qscrollbar.cc',
         'src/QtGui/qcloseevent.cc',
+        'src/QtGui/qevent.cc',
+        'src/QtGui/qresizeevent.cc',
 
         'src/QtTest/qtesteventlist.cc'
       ],
