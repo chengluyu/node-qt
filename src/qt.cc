@@ -53,6 +53,7 @@
 #include "QtGui/qcloseevent.h"
 #include "QtGui/qevent.h"
 #include "QtGui/qresizeevent.h"
+#include "QtGui/qtextedit.h"
 
 #include "QtTest/qtesteventlist.h"
 
@@ -82,6 +83,7 @@ void Initialize(Handle<Object> target) {
   QCloseEventWrap::Initialize(target);
   QEventWrap::Initialize(target);
   QResizeEventWrap::Initialize(target);
+  QTextEditWrap::Initialize(target);
 }
 
 NODE_MODULE(qt, Initialize)

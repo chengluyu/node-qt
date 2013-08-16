@@ -283,6 +283,10 @@ void QWidgetWrap::Initialize(Handle<Object> target) {
       FunctionTemplate::New(X)->GetFunction());
   tpl->PrototypeTemplate()->Set(String::NewSymbol("y"),
       FunctionTemplate::New(Y)->GetFunction());
+  tpl->PrototypeTemplate()->Set(String::NewSymbol("windowTitle"),
+      FunctionTemplate::New(WindowTitle)->GetFunction());
+  tpl->PrototypeTemplate()->Set(String::NewSymbol("setWindowTitle"),
+      FunctionTemplate::New(SetWindowTitle)->GetFunction());
 
   // Events
   tpl->PrototypeTemplate()->Set(String::NewSymbol("paintEvent"),
@@ -651,4 +655,27 @@ Handle<Value> QWidgetWrap::Y(const Arguments& args) {
   QWidgetImpl* q = w->GetWrapped();
 
   return scope.Close(Integer::New(q->y()));
+}
+
+Handle<Value> QWidgetWrap::WindowTitle(const Arguments& args) {
+  HandleScope scope;
+
+  QWidgetWrap* w = node::ObjectWrap::Unwrap<QWidgetWrap>(args.This());
+  QWidgetImpl* q = w->GetWrapped();
+
+  return scope.Close(qt_v8::FromQString(q->windowTitle()));
+}
+
+Handle<Value> QWidgetWrap::SetWindowTitle(const Arguments& args) {
+  HandleScope scope;
+
+  QWidgetWrap* w = node::ObjectWrap::Unwrap<QWidgetWrap>(args.This());
+  QWidgetImpl* q = w->GetWrapped();
+
+  if (args[0]->IsString() || args[0]->IsStringObject()) {
+    QString text = qt_v8::ToQString(args[0]->ToString());
+    q->setWindowTitle(text);
+  }
+
+  return scope.Close(Undefined());
 }

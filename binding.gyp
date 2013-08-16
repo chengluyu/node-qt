@@ -28,6 +28,7 @@
         'src/QtGui/qcloseevent.cc',
         'src/QtGui/qevent.cc',
         'src/QtGui/qresizeevent.cc',
+        'src/QtGui/qtextedit.cc',
 
         'src/QtTest/qtesteventlist.cc'
       ],
